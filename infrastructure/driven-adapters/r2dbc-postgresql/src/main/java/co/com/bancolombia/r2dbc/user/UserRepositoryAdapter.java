@@ -2,6 +2,8 @@ package co.com.bancolombia.r2dbc.user;
 
 import co.com.bancolombia.model.user.User;
 import co.com.bancolombia.model.user.gateways.UserRepository;
+import co.com.bancolombia.r2dbc.role.RoleR2dbcRepository;
+import co.com.bancolombia.r2dbc.role.mapper.RoleMapper;
 import co.com.bancolombia.r2dbc.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -18,6 +20,7 @@ import java.time.LocalDateTime;
 public class UserRepositoryAdapter implements UserRepository {
 
     private final UserR2dbcRepository repository;
+    private final RoleR2dbcRepository roleRepository;
 
     @Override
     @Transactional
@@ -33,6 +36,7 @@ public class UserRepositoryAdapter implements UserRepository {
                         data.getPhone(),
                         data.getEmailAddress(),
                         data.getBaseSalary(),
+                        data.getIdRol(),
                         data.getCreationDate(),
                         data.getUpdateDate()
                 ))
@@ -73,6 +77,7 @@ public class UserRepositoryAdapter implements UserRepository {
     public Mono<User> getUserById(String id) {
         log.debug("Obteniendo usuario por ID: {}", id);
         return repository.findById(id)
+                .flatMap(this::enrichWithRole)
                 .map(UserMapper::toDomain)
                 .doOnSuccess(user ->
                         log.debug("Usuario encontrado: {}", user != null ? user.getId() : "null")
@@ -93,6 +98,7 @@ public class UserRepositoryAdapter implements UserRepository {
     public Flux<User> findAll() {
         log.debug("Obteniendo todos los usuarios");
         return repository.findAll()
+                .flatMap(this::enrichWithRole)
                 .map(UserMapper::toDomain)
                 .doOnComplete(() -> log.debug("Consulta de usuarios completada"));
     }
@@ -107,6 +113,17 @@ public class UserRepositoryAdapter implements UserRepository {
                 .doOnError(error ->
                         log.error("Error al eliminar usuario con ID {}: {}", id, error.getMessage())
                 );
+    }
+
+    private Mono<co.com.bancolombia.r2dbc.user.data.UserData> enrichWithRole(co.com.bancolombia.r2dbc.user.data.UserData userData) {
+        if (userData.getIdRol() == null) {
+            return Mono.just(userData);
+        }
+        return roleRepository.findById(userData.getIdRol())
+                .map(roleData -> userData.toBuilder()
+                        .role(roleData)
+                        .build())
+                .switchIfEmpty(Mono.just(userData));
     }
 
 }

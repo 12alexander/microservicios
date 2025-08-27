@@ -38,4 +38,7 @@ public class UserRequestDTO {
     @DecimalMax(value = "15000000", message = "El salario base no puede ser mayor a 15,000,000")
     private BigDecimal baseSalary;
 
+    @NotBlank(message = "El ID del rol es requerido")
+    private String idRol;
+
 }

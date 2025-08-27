@@ -4,6 +4,10 @@ import co.com.bancolombia.api.user.dto.UserRequestDTO;
 import co.com.bancolombia.api.user.dto.UserResponseDTO;
 import co.com.bancolombia.api.user.mapper.UserDTOMapper;
 import co.com.bancolombia.usecase.user.UserUseCase;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,12 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.awt.*;
+import reactor.core.publisher.Flux;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/usuarios")
 @RequiredArgsConstructor
+@Tag(name = "Usuarios", description = "API para gestión de usuarios")
 public class UserController {
 
     private final UserUseCase userUseCase;
@@ -50,7 +55,7 @@ public class UserController {
         log.info("Recibida petición de actualización de usuario con ID: {}", id);
 
         return Mono.fromCallable(() -> UserDTOMapper.toDomain(request))
-                .flatMap(user -> userUseCase::updateUser(id, user))
+                .flatMap(user -> userUseCase.updateUser(id, user))
                 .map(UserDTOMapper::toResponse)
                 .doOnSuccess(response ->
                         log.info("Usuario actualizado exitosamente con ID: {}", response.getId())
@@ -61,20 +66,20 @@ public class UserController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<UsuarioResponseDTO> obtenerTodosLosUsuarios() {
+    public Flux<UserResponseDTO> getAllUsers() {
         log.info("Recibida petición para obtener todos los usuarios");
 
-        return obtenerTodosLosUsuariosUseCase.obtenerTodosLosUsuarios()
-                .map(UsuarioDTOMapper::toResponse)
+        return userUseCase.getAllUsers()
+                .map(UserDTOMapper::toResponse)
                 .doOnComplete(() -> log.info("Consulta de usuarios completada"));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<UsuarioResponseDTO> obtenerUsuarioPorId(@PathVariable String id) {
+    public Mono<UserResponseDTO> getUserById(@PathVariable String id) {
         log.info("Recibida petición para obtener usuario con ID: {}", id);
 
-        return obtenerUsuarioPorIdUseCase.obtenerPorId(id)
-                .map(UsuarioDTOMapper::toResponse)
+        return userUseCase.getUserById(id)
+                .map(UserDTOMapper::toResponse)
                 .doOnSuccess(response ->
                         log.info("Usuario encontrado con ID: {}", response.getId())
                 )
@@ -85,10 +90,10 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Mono<Void> eliminarUsuario(@PathVariable String id) {
+    public Mono<Void> deleteUser(@PathVariable String id) {
         log.info("Recibida petición para eliminar usuario con ID: {}", id);
 
-        return eliminarUsuarioUseCase.eliminarUsuario(id)
+        return userUseCase.deleteUser(id)
                 .doOnSuccess(unused ->
                         log.info("Usuario eliminado exitosamente con ID: {}", id)
                 )

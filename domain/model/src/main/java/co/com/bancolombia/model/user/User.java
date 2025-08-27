@@ -1,4 +1,5 @@
 package co.com.bancolombia.model.user;
+import co.com.bancolombia.model.role.Role;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -18,6 +19,8 @@ public class User {
     private String phone;
     private String emailAddress;
     private BigDecimal baseSalary;
+    private String idRol;
+    private Role role;
 
     public static class UserBuilder {
         public UserBuilder name(String name) {
@@ -58,6 +61,14 @@ public class User {
             this.baseSalary = baseSalary;
             return this;
         }
+
+        public UserBuilder idRol(String idRol) {
+            if(idRol == null || idRol.trim().isEmpty()){
+                throw new IllegalArgumentException("ID del rol no puede ser Nulo o Vacio");
+            }
+            this.idRol = idRol.trim();
+            return this;
+        }
     }
 
     public void  validateData(){
@@ -88,6 +99,10 @@ public class User {
 
         if (baseSalary.compareTo(new BigDecimal("15000000")) > 0) {
             throw new IllegalArgumentException("El salario base no puede ser mayor a 15,000,000");
+        }
+
+        if (idRol == null || idRol.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID del rol no puede ser nulo o vacío");
         }
 
     }

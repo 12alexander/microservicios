@@ -1,5 +1,6 @@
 package co.com.bancolombia.r2dbc.user.data;
 
+import co.com.bancolombia.r2dbc.role.data.RoleData;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.annotation.Id;
@@ -47,5 +48,10 @@ public class UserData {
 
     @Column("update_date")
     private LocalDateTime updateDate;
+
+    @Column("id_rol")
+    private String idRol;
+
+    private RoleData role;
 
 }

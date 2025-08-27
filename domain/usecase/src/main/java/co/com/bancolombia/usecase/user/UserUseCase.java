@@ -2,20 +2,24 @@ package co.com.bancolombia.usecase.user;
 
 import co.com.bancolombia.model.exception.InvalidDataException;
 import co.com.bancolombia.model.exception.UserExistsException;
+import co.com.bancolombia.model.role.gateways.RoleRepository;
 import co.com.bancolombia.model.user.User;
 import co.com.bancolombia.model.user.gateways.UserRepository;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 import java.util.UUID;
 
 @RequiredArgsConstructor
 public class UserUseCase {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     public Mono<User> saveUser(User user) {
         return Mono.fromRunnable(() -> validateData(user))
                 .then(confirmEmailNotRegistered(user.getEmailAddress()))
+                .then(confirmRoleExists(user.getIdRol()))
                 .then(Mono.fromCallable(() -> asignarId(user)))
                 .flatMap(this::createUser);
     }
@@ -24,8 +28,9 @@ public class UserUseCase {
         return Mono.fromRunnable(() -> validateData(usuario))
                 .then(userRepository.getUserById(id))
                 .switchIfEmpty(Mono.error(new UserExistsException(id)))
+                .then(confirmRoleExists(usuario.getIdRol()))
                 .then(Mono.fromCallable(() -> usuario.toBuilder().id(id).build()))
-                .flatMap(this::updateUser);
+                .flatMap(userRepository::updateUser);
     }
 
     private void validateData(User user) {
@@ -46,6 +51,16 @@ public class UserUseCase {
                 });
     }
 
+    private Mono<Void> confirmRoleExists(String idRol) {
+        return roleRepository.existsById(idRol)
+                .flatMap(exists -> {
+                    if (!exists) {
+                        return Mono.error(new InvalidDataException("El rol con ID " + idRol + " no existe"));
+                    }
+                    return Mono.empty();
+                });
+    }
+
     private User asignarId(User user) {
         return user.toBuilder()
                 .id(UUID.randomUUID().toString())
@@ -59,10 +74,33 @@ public class UserUseCase {
                 );
     }
 
-    private Mono<User> updateUser(User user) {
-        return userRepository.updateUser(user)
+    public Flux<User> getAllUsers() {
+        return userRepository.findAll()
                 .onErrorMap(error ->
-                        new InvalidDataException("Error interno al actualizar usuario", error)
+                        new InvalidDataException("Error interno al obtener usuarios", error)
                 );
+    }
+
+    public Mono<User> getUserById(String id) {
+        return userRepository.getUserById(id)
+                .switchIfEmpty(Mono.error(new UserExistsException("Usuario no encontrado con ID: " + id)))
+                .onErrorMap(error -> {
+                    if (error instanceof UserExistsException) {
+                        return error;
+                    }
+                    return new InvalidDataException("Error interno al obtener usuario", error);
+                });
+    }
+
+    public Mono<Void> deleteUser(String id) {
+        return userRepository.getUserById(id)
+                .switchIfEmpty(Mono.error(new UserExistsException("Usuario no encontrado con ID: " + id)))
+                .then(userRepository.deleteById(id))
+                .onErrorMap(error -> {
+                    if (error instanceof UserExistsException) {
+                        return error;
+                    }
+                    return new InvalidDataException("Error interno al eliminar usuario", error);
+                });
     }
 }

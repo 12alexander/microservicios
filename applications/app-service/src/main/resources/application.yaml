@@ -13,11 +13,11 @@ spring:
       max-idle-time: 30m
       validation-query: SELECT 1
   liquibase:
-    enabled: false
-    #change-log: classpath:db/changelog/db.changelog-master.xml
-    #url: jdbc:postgresql://localhost:5432/project_pragma
-    #user: postgres
-    #password: 123456
+    enabled: true
+    change-log: classpath:db/db.changelog-master.xml
+    url: jdbc:postgresql://localhost:5432/project_pragma
+    user: postgres
+    password: 123456
 
 # Agrega esta sección para PostgresqlConnectionProperties
 adapters:

@@ -1,6 +1,7 @@
 package co.com.bancolombia.r2dbc.user.mapper;
 
 import co.com.bancolombia.model.user.User;
+import co.com.bancolombia.r2dbc.role.mapper.RoleMapper;
 import co.com.bancolombia.r2dbc.user.data.UserData;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class UserMapper {
                 .phone(user.getPhone())
                 .emailAddress(user.getEmailAddress())
                 .baseSalary(user.getBaseSalary())
+                .idRol(user.getIdRol())
                 .creationDate(now)
                 .updateDate(now)
                 .build();
@@ -37,6 +39,7 @@ public class UserMapper {
                 .phone(user.getPhone())
                 .emailAddress(user.getEmailAddress())
                 .baseSalary(user.getBaseSalary())
+                .idRol(user.getIdRol())
                 .updateDate(now)
                 .build();
     }
@@ -51,6 +54,8 @@ public class UserMapper {
                 .phone(userData.getPhone())
                 .emailAddress(userData.getEmailAddress())
                 .baseSalary(userData.getBaseSalary())
+                .idRol(userData.getIdRol())
+                .role(RoleMapper.toDomain(userData.getRole()))
                 .build();
     }
 }

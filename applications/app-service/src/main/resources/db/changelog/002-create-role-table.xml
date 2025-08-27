@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="002-create-role-table" author="sistema">
+        <comment>Crear tabla roles y agregar relación con usuarios</comment>
+
+        <createTable tableName="roles">
+            <column name="id_rol" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nombre" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="descripcion" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addColumn tableName="users">
+            <column name="id_rol" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addForeignKeyConstraint baseTableName="users"
+                                 baseColumnNames="id_rol"
+                                 constraintName="fk_user_role"
+                                 referencedTableName="roles"
+                                 referencedColumnNames="id_rol"/>
+
+        <createIndex tableName="roles" indexName="idx_role_nombre">
+            <column name="nombre"/>
+        </createIndex>
+
+        <createIndex tableName="users" indexName="idx_user_id_rol">
+            <column name="id_rol"/>
+        </createIndex>
+
+        <insert tableName="roles">
+            <column name="id_rol" value="1"/>
+            <column name="nombre" value="ADMIN"/>
+            <column name="descripcion" value="Administrador del sistema"/>
+        </insert>
+
+        <insert tableName="roles">
+            <column name="id_rol" value="2"/>
+            <column name="nombre" value="USER"/>
+            <column name="descripcion" value="Usuario estándar"/>
+        </insert>
+
+        <insert tableName="roles">
+            <column name="id_rol" value="3"/>
+            <column name="nombre" value="GUEST"/>
+            <column name="descripcion" value="Usuario invitado"/>
+        </insert>
+
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="users" constraintName="fk_user_role"/>
+            <dropColumn tableName="users" columnName="id_rol"/>
+            <dropTable tableName="roles"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
