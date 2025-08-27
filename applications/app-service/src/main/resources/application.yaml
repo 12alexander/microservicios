@@ -1,0 +1,42 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: "projectPragma"
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/project_pragma
+    username: postgres
+    password: 123456
+    pool:
+      initial-size: 5
+      max-size: 10
+      max-idle-time: 30m
+      validation-query: SELECT 1
+  liquibase:
+    enabled: false
+    #change-log: classpath:db/changelog/db.changelog-master.xml
+    #url: jdbc:postgresql://localhost:5432/project_pragma
+    #user: postgres
+    #password: 123456
+
+# Agrega esta sección para PostgresqlConnectionProperties
+adapters:
+  r2dbc:
+    host: localhost
+    port: 5432
+    database: project_pragma
+    schema: public
+    username: postgres
+    password: 123456
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,prometheus"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+cors:
+  allowed-origins: "http://localhost:4200,http://localhost:8080"
