@@ -18,8 +18,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/project_pragma
     user: postgres
     password: 123456
-
-# Agrega esta sección para PostgresqlConnectionProperties
 adapters:
   r2dbc:
     host: localhost
@@ -28,7 +26,6 @@ adapters:
     schema: public
     username: postgres
     password: 123456
-
 management:
   endpoints:
     web:
@@ -38,5 +35,17 @@ management:
     health:
       probes:
         enabled: true
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
+logging:
+  level:
+    root: INFO
+  file:
+    name: logs/crediya.log

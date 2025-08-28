@@ -1,6 +1,7 @@
 package co.com.bancolombia.r2dbc.user;
 
 import co.com.bancolombia.model.user.User;
+import co.com.bancolombia.r2dbc.role.RoleR2dbcRepository;
 import co.com.bancolombia.r2dbc.user.data.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +28,9 @@ class UserRepositoryAdapterTest {
     @Mock
     private UserR2dbcRepository repository;
 
+    @Mock
+    private RoleR2dbcRepository roleRepository;
+
     @InjectMocks
     private UserRepositoryAdapter userRepositoryAdapter;
 
@@ -44,6 +48,7 @@ class UserRepositoryAdapterTest {
                 .phone("1234567890")
                 .emailAddress("juan.perez@email.com")
                 .baseSalary(new BigDecimal("1000000"))
+                .idRol("ROL_USER")
                 .build();
 
         userData = UserData.builder()
@@ -55,6 +60,7 @@ class UserRepositoryAdapterTest {
                 .phone("1234567890")
                 .emailAddress("juan.perez@email.com")
                 .baseSalary(new BigDecimal("1000000"))
+                .idRol("ROL_USER")
                 .creationDate(LocalDateTime.now())
                 .updateDate(LocalDateTime.now())
                 .build();
@@ -65,7 +71,7 @@ class UserRepositoryAdapterTest {
     void createUser_Success() {
         when(repository.createUser(anyString(), anyString(), anyString(), any(LocalDate.class),
                 anyString(), anyString(), anyString(), any(BigDecimal.class),
-                any(LocalDateTime.class), any(LocalDateTime.class)))
+                anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .thenReturn(Mono.just(1));
         when(repository.findById(user.getId()))
                 .thenReturn(Mono.just(userData));
@@ -78,7 +84,7 @@ class UserRepositoryAdapterTest {
 
         verify(repository).createUser(anyString(), anyString(), anyString(), any(LocalDate.class),
                 anyString(), anyString(), anyString(), any(BigDecimal.class),
-                any(LocalDateTime.class), any(LocalDateTime.class));
+                anyString(), any(LocalDateTime.class), any(LocalDateTime.class));
         verify(repository).findById(user.getId());
     }
 
@@ -127,6 +133,8 @@ class UserRepositoryAdapterTest {
     void getUserById_UserExists_Success() {
         when(repository.findById("123"))
                 .thenReturn(Mono.just(userData));
+        when(roleRepository.findById("ROL_USER"))
+                .thenReturn(Mono.empty());
 
         StepVerifier.create(userRepositoryAdapter.getUserById("123"))
                 .expectNextMatches(foundUser -> foundUser.getId().equals("123") &&
@@ -171,6 +179,9 @@ class UserRepositoryAdapterTest {
 
         when(repository.findAll())
                 .thenReturn(Flux.just(userData, userData2));
+
+        when(roleRepository.findById("ROL_USER"))
+                .thenReturn(Mono.empty());
 
         StepVerifier.create(userRepositoryAdapter.findAll())
                 .expectNextCount(2)

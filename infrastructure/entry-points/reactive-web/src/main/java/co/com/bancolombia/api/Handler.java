@@ -1,5 +1,6 @@
 package co.com.bancolombia.api;
 
+import co.com.bancolombia.api.user.dto.UserResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -12,9 +13,9 @@ public class Handler {
 //private  final UseCase useCase;
 //private  final UseCase2 useCase2;
 
-    public Mono<ServerResponse> listenGETUseCase(ServerRequest serverRequest) {
+    public Mono<ServerResponse> saveUser(ServerRequest serverRequest) {
         // useCase.logic();
-        return ServerResponse.ok().bodyValue("");
+        return null;
     }
 
     public Mono<ServerResponse> listenGETOtherUseCase(ServerRequest serverRequest) {

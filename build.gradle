@@ -34,4 +34,8 @@ sonar {
     }
 }
 
+compileJava {
+    options.compilerArgs.add('-parameters')
+}
+
 apply from: './main.gradle'

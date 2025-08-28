@@ -25,6 +25,14 @@ subprojects {
 
     test {
         useJUnitPlatform()
+        systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+
+        // Para compatibilidad con Java 22/21
+        jvmArgs = [
+                '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+                '--add-opens', 'java.base/java.util=ALL-UNNAMED',
+                '-XX:+AllowRedefinitionToAddDeleteMethods'
+        ]
     }
 
     dependencies {
@@ -34,7 +42,12 @@ subprojects {
         testImplementation 'io.projectreactor.tools:blockhound-junit-platform:1.0.13.RELEASE'
 
         testImplementation 'io.projectreactor:reactor-test'
+
+        // Force JUnit versions para compatibilidad
+        testImplementation platform('org.junit:junit-bom:5.12.2')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
         compileOnly "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor  "org.projectlombok:lombok:${lombokVersion}"
@@ -43,13 +56,14 @@ subprojects {
         implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
     }
 
-    tasks.withType(Test).configureEach {
-        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_13)) {
-            jvmArgs += [
-                    "-XX:+AllowRedefinitionToAddDeleteMethods"
-            ]
-        }
-    }
+    // Remover esta sección duplicada ya que está en test{}
+    // tasks.withType(Test).configureEach {
+    //     if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_13)) {
+    //         jvmArgs += [
+    //                 "-XX:+AllowRedefinitionToAddDeleteMethods"
+    //         ]
+    //     }
+    // }
 
     test.finalizedBy(project.tasks.jacocoTestReport)
 
@@ -68,7 +82,11 @@ subprojects {
         fileExtensionsToFilter.addAll('xml', 'orbit')
         junit5PluginVersion = '1.2.2'
         failWhenNoMutations = false
-        jvmArgs = ["-XX:+AllowRedefinitionToAddDeleteMethods"]
+        jvmArgs = [
+                "-XX:+AllowRedefinitionToAddDeleteMethods",
+                "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+                "--add-opens", "java.base/java.util=ALL-UNNAMED"
+        ]
     }
 
     jacocoTestReport {

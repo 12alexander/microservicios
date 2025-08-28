@@ -55,7 +55,8 @@ public class UserMapper {
                 .emailAddress(userData.getEmailAddress())
                 .baseSalary(userData.getBaseSalary())
                 .idRol(userData.getIdRol())
-                .role(RoleMapper.toDomain(userData.getRole()))
+                .role(userData.getRole() != null ? RoleMapper.toDomain(userData.getRole()) :
+                        null)  // ← FIX AQUÍ
                 .build();
     }
 }

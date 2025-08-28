@@ -5,6 +5,7 @@ import co.com.bancolombia.model.exception.UserExistsException;
 import co.com.bancolombia.model.role.gateways.RoleRepository;
 import co.com.bancolombia.model.user.User;
 import co.com.bancolombia.model.user.gateways.UserRepository;
+import co.com.bancolombia.usecase.user.interfaces.IUserUseCase;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
@@ -12,7 +13,8 @@ import reactor.core.publisher.Flux;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class UserUseCase {
+public class UserUseCase implements IUserUseCase {
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
@@ -92,10 +94,23 @@ public class UserUseCase {
                 });
     }
 
+    /*
+        public Mono<Void> deleteUser(String id) {
+            return userRepository.getUserById(id)
+                    .switchIfEmpty(Mono.error(new UserExistsException("Usuario no encontrado con ID: " + id)))
+                    .then(userRepository.deleteById(id))
+                    .onErrorMap(error -> {
+                        if (error instanceof UserExistsException) {
+                            return error;
+                        }
+                        return new InvalidDataException("Error interno al eliminar usuario", error);
+                    });
+        }*/
     public Mono<Void> deleteUser(String id) {
         return userRepository.getUserById(id)
-                .switchIfEmpty(Mono.error(new UserExistsException("Usuario no encontrado con ID: " + id)))
-                .then(userRepository.deleteById(id))
+                .switchIfEmpty(Mono.error(new UserExistsException("Usuario no encontrado con ID: "
+                        + id)))
+                .flatMap(user -> userRepository.deleteById(id))
                 .onErrorMap(error -> {
                     if (error instanceof UserExistsException) {
                         return error;
