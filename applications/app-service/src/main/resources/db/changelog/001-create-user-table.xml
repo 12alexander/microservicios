@@ -2,9 +2,15 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+                     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <changeSet id="001-create-user-table" author="sistema">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
+
         <comment>Crear tabla usuarios para almacenar información de solicitantes</comment>
 
         <createTable tableName="users">
@@ -40,20 +46,20 @@
             </column>
         </createTable>
 
-        <addUniqueConstraint tableName="user"
+        <addUniqueConstraint tableName="users"
                              columnNames="email_address"
-                             constraintName="uk_user_email_address"/>
+                             constraintName="uk_users_email_address"/>
 
-        <createIndex tableName="user" indexName="idx_user_email_address">
+        <createIndex tableName="users" indexName="idx_users_email_address">
             <column name="email_address"/>
         </createIndex>
 
-        <createIndex tableName="user" indexName="idx_user_creation_date">
+        <createIndex tableName="users" indexName="idx_users_creation_date">
             <column name="creation_date"/>
         </createIndex>
 
         <rollback>
-            <dropTable tableName="user"/>
+            <dropTable tableName="users"/>
         </rollback>
     </changeSet>
 

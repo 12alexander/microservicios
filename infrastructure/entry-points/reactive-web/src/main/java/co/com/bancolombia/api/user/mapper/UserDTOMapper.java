@@ -1,5 +1,6 @@
 package co.com.bancolombia.api.user.mapper;
 
+import co.com.bancolombia.api.user.dto.RoleResponseDTO;
 import co.com.bancolombia.api.user.dto.UserRequestDTO;
 import co.com.bancolombia.api.user.dto.UserResponseDTO;
 import co.com.bancolombia.model.user.User;
@@ -19,6 +20,7 @@ public class UserDTOMapper {
                 .phone(request.getPhone())
                 .emailAddress(request.getEmailAddress())
                 .baseSalary(request.getBaseSalary())
+                .idRol(request.getIdRol())
                 .build();
     }
 
@@ -32,6 +34,12 @@ public class UserDTOMapper {
                 .phone(user.getPhone())
                 .emailAddress(user.getEmailAddress())
                 .baseSalary(user.getBaseSalary())
+                .idRol(user.getIdRol())
+                .role(user.getRole() != null ? RoleResponseDTO.builder()
+                        .idRol(user.getRole().getIdRol())
+                        .nombre(user.getRole().getNombre())
+                        .descripcion(user.getRole().getDescripcion())
+                        .build() : null)
                 .build();
     }
 

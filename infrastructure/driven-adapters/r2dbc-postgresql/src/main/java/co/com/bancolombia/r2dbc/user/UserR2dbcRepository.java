@@ -15,12 +15,13 @@ import java.time.LocalDateTime;
 public interface UserR2dbcRepository extends ReactiveCrudRepository<UserData, String> {
 
     @Modifying
-    @Query("INSERT INTO users (id, name, last_name, birth_date, address, phone, email_address, base_salary, creation_date, update_date ) " +
-            "VALUES (:id, :name, :last_name, :birth_date, :address, :phone, :email_address, :base_salary, :creation_date, :update_date)")
-    Mono<Integer> createUser(String id, String name, String last_name, LocalDate birth_date, String address, String phone, String email_address, BigDecimal base_salary, LocalDateTime creation_date, LocalDateTime update_date);
+    @Query("INSERT INTO users (id, name, last_name, birth_date, address, phone, email_address, base_salary, id_rol, creation_date, update_date ) " +
+            "VALUES (:id, :name, :last_name, :birth_date, :address, :phone, :email_address, :base_salary, :id_rol, :creation_date, :update_date)")
+    Mono<Integer> createUser(String id, String name, String last_name, LocalDate birth_date, String address, String phone, String email_address, BigDecimal base_salary, String id_rol, LocalDateTime creation_date, LocalDateTime update_date);
 
     @Query("SELECT EXISTS(SELECT 1 FROM users WHERE email_address = :emailAddress)")
     Mono<Boolean> existsByEmailAddress(String emailAddress);
 
     Mono<UserData> findByEmailAddress(String emailAddress);
+
 }
