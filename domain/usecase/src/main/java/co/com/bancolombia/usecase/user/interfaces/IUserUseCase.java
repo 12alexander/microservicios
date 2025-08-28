@@ -9,5 +9,7 @@ public interface IUserUseCase {
     Mono<User> updateUser(String id, User usuario);
     Flux<User> getAllUsers();
     Mono<User> getUserById(String id);
+    Mono<User> findById(Long id);
+    Flux<User> findAll();
     Mono<Void> deleteUser(String id);
 }

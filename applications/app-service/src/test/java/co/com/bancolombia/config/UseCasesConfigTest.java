@@ -3,23 +3,33 @@ package co.com.bancolombia.config;
 import co.com.bancolombia.usecase.user.UserUseCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import co.com.bancolombia.model.user.gateways.UserRepository;
 import co.com.bancolombia.model.role.gateways.RoleRepository;
 
-@SpringBootTest
-@ContextConfiguration(classes = {UseCasesConfig.class})
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+
+@SpringBootTest(classes = UseCasesConfig.class)
 class UseCasesConfigTest {
 
-    @MockBean
+    @MockitoBean
     private UserRepository userRepository;
 
-    @MockBean
+    @MockitoBean
     private RoleRepository roleRepository;
+
+    @Autowired
+    private UserUseCase userUseCase;
 
     @Test
     void testContextLoads() {
-        // Test que el contexto carga correctamente
+        assertNotNull(userUseCase);
+    }
+
+    @Test
+    void testUserUseCaseIsCreated() {
+        assertNotNull(userUseCase);
     }
 }

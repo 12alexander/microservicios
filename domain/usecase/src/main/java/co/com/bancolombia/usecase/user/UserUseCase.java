@@ -118,4 +118,14 @@ public class UserUseCase implements IUserUseCase {
                     return new InvalidDataException("Error interno al eliminar usuario", error);
                 });
     }
+
+    @Override
+    public Mono<User> findById(Long id) {
+        return getUserById(String.valueOf(id));
+    }
+
+    @Override
+    public Flux<User> findAll() {
+        return getAllUsers();
+    }
 }

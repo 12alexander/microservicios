@@ -102,7 +102,7 @@ class RouterRestTest {
 
         UserHandler handler = new UserHandler ( userUseCase );
         RouterRest routerRest = new RouterRest ( );
-        RouterFunction<ServerResponse> router = routerRest.usuarioRoutes ( handler );
+        RouterFunction<ServerResponse> router = routerRest.userRoutes ( handler );
 
         var webHandler = RouterFunctions.toWebHandler ( router );
         HttpHandler httpHandler = WebHttpHandlerBuilder.webHandler ( webHandler )

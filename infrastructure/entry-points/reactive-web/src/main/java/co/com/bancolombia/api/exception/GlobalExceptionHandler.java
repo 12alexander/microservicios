@@ -13,7 +13,7 @@ import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO error = ErrorResponseDTO.builder()
                 .code(ex.getCode())
                 .message(ex.getMessage())
-                .timestamp(LocalDateTime.now())
+                .timestamp(Instant.now())
                 .path(exchange.getRequest().getPath().value())
                 .build();
 
@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO error = ErrorResponseDTO.builder()
                 .code(ex.getCode())
                 .message(ex.getMessage())
-                .timestamp(LocalDateTime.now())
+                .timestamp(Instant.now())
                 .path(exchange.getRequest().getPath().value())
                 .build();
 
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO error = ErrorResponseDTO.builder()
                 .code("VALIDATION_ERROR")
                 .message("Errores de validación: " + errorsMessage)
-                .timestamp(LocalDateTime.now())
+                .timestamp(Instant.now())
                 .path(exchange.getRequest().getPath().value())
                 .build();
 
@@ -87,7 +87,7 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO error = ErrorResponseDTO.builder()
                 .code(ex.getCode())
                 .message(ex.getMessage())
-                .timestamp(LocalDateTime.now())
+                .timestamp(Instant.now())
                 .path(exchange.getRequest().getPath().value())
                 .build();
 
@@ -104,7 +104,7 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO error = ErrorResponseDTO.builder()
                 .code("INTERNAL_ERROR")
                 .message("Ha ocurrido un error interno. Intente nuevamente.")
-                .timestamp(LocalDateTime.now())
+                .timestamp(Instant.now())
                 .path(exchange.getRequest().getPath().value())
                 .build();
 
