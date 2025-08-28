@@ -26,7 +26,7 @@ public class UseCasesConfig {
         public IUserUseCase usuarioUseCase(UserRepository userRepository, RoleRepository roleRepository) {
                 return new UserUseCase(userRepository, roleRepository);
         }*/
-       @Bean
+       @Bean("userUseCaseBean")
        public IUserUseCase userUseCase(UserRepository userRepository, RoleRepository roleRepository) {
            return new UserUseCase(userRepository, roleRepository);
        }
