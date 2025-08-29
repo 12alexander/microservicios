@@ -17,17 +17,9 @@ import org.springframework.context.annotation.FilterType;
         },
         useDefaultFilters = false)*/
 public class UseCasesConfig {
-       /* @Bean
-        public IRegisterUserUseCase userUseCaseI(UserRepository repository, RoleRepository roleRepository) {
-                return new RegisterUserUseCase( repository,roleRepository );
-        }*/
-/*
-        @Bean
-        public IUserUseCase usuarioUseCase(UserRepository userRepository, RoleRepository roleRepository) {
-                return new UserUseCase(userRepository, roleRepository);
-        }*/
-       @Bean("userUseCaseBean")
-       public IUserUseCase userUseCase(UserRepository userRepository, RoleRepository roleRepository) {
-           return new UserUseCase(userRepository, roleRepository);
-       }
+    @Bean
+    public IUserUseCase userUseCase(UserRepository userRepository, RoleRepository
+            roleRepository) {
+        return new UserUseCase(userRepository, roleRepository);
+    }
 }

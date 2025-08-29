@@ -27,7 +27,7 @@ public class RouterRest {
 
     private static final String API_V1_USERS = "/api/v1/users";
 
-    @Bean
+    @Bean("userRoutes")
     @RouterOperations({
             @RouterOperation(
                     path = API_V1_USERS,

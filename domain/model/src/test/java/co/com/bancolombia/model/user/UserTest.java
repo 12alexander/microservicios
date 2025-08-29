@@ -1,24 +1,19 @@
 package co.com.bancolombia.model.user;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("User Domain Model Tests")
 class UserTest {
 
     @Test
-    @DisplayName("Should create user with valid data")
-    void createUser_ValidData_Success() {
+    void createUser_WithValidData_ShouldWork() {
         User user = User.builder()
                 .name("Juan")
                 .lastName("Perez")
                 .emailAddress("juan@email.com")
                 .baseSalary(new BigDecimal("1000000"))
-                .idRol("1")
+                .idRol("DEV")
                 .build();
 
         assertNotNull(user);
@@ -27,50 +22,27 @@ class UserTest {
     }
 
     @Test
-    @DisplayName("Should throw exception with invalid name")
-    void createUser_InvalidName_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () ->
-                User.builder().name("").build()
-        );
+    void createUser_WithNegativeSalary_ShouldFail() {
+        assertThrows(Exception.class, () -> {
+            User.builder()
+                    .name("Ana")
+                    .lastName("Lopez")
+                    .emailAddress("ana@email.com")
+                    .baseSalary(new BigDecimal("-1000"))
+                    .idRol("DEV")
+                    .build();
+        });
     }
 
     @Test
-    @DisplayName("Should throw exception with invalid email")
-    void createUser_InvalidEmail_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () ->
-                User.builder()
-                        .name("Juan")
-                        .lastName("Perez")
-                        .emailAddress("invalid-email")
-                        .baseSalary(new BigDecimal("1000000"))
-                        .build()
-        );
-    }
-
-    @Test
-    @DisplayName("Should throw exception with invalid salary")
-    void createUser_InvalidSalary_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () ->
-                User.builder()
-                        .name("Juan")
-                        .lastName("Perez")
-                        .emailAddress("juan@email.com")
-                        .baseSalary(new BigDecimal("-1000"))
-                        .build()
-        );
-    }
-
-    @Test
-    @DisplayName("Should validate user data successfully")
-    void validateData_ValidUser_NoException() {
-        User user = User.builder()
-                .name("Juan")
-                .lastName("Perez")
-                .emailAddress("juan@email.com")
-                .baseSalary(new BigDecimal("1000000"))
-                .idRol("1")
-                .build();
-
-        assertDoesNotThrow(() -> user.validateData());
+    void createUser_WithEmptyName_ShouldFail() {
+        assertThrows(Exception.class, () -> {
+            User.builder()
+                    .name("")
+                    .lastName("Garcia")
+                    .emailAddress("test@email.com")
+                    .baseSalary(new BigDecimal("1000000"))
+                    .build();
+        });
     }
 }

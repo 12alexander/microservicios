@@ -30,11 +30,9 @@ import java.time.Duration;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@DependsOn({"userRepositoryAdapter", "roleRepositoryAdapter"})
 @Tag(name = "User Management", description = "Operations related to user management")
 public class UserHandler {
 
-    @Qualifier("userUseCaseBean")
     private final IUserUseCase userUseCase;
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(30);
 
@@ -73,8 +71,7 @@ public class UserHandler {
         String userId = request.pathVariable("id");
         log.info("Fetching user with ID: {}", userId);
 
-        return Mono.fromCallable(() -> Long.parseLong(userId))
-                .flatMap(userUseCase::findById)
+        return userUseCase.getUserById(userId)
                 .map(UserDTOMapper::toResponse)
                 .flatMap(response -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,17 +112,24 @@ public class UserHandler {
     }
 
     private Mono<ServerResponse> handleError(Throwable throwable) {
+        log.error("Error processing request: {}", throwable.getMessage(), throwable);
+
         return switch (throwable) {
             case UserExistsException userExists ->
-                    buildErrorResponse(HttpStatus.CONFLICT, "USER_EXISTS", userExists.getMessage());
+                    buildErrorResponse(HttpStatus.CONFLICT, "USER_EXISTS", 
+                        "El email ya está registrado en el sistema");
             case InvalidDataException invalidData ->
-                    buildErrorResponse(HttpStatus.BAD_REQUEST, "INVALID_DATA", invalidData.getMessage());
+                    buildErrorResponse(HttpStatus.BAD_REQUEST, "INVALID_DATA", 
+                        "Los datos proporcionados no son válidos");
             case BusinessException businessError ->
-                    buildErrorResponse(HttpStatus.BAD_REQUEST, "BUSINESS_ERROR", businessError.getMessage());
+                    buildErrorResponse(HttpStatus.BAD_REQUEST, "BUSINESS_ERROR", 
+                        "Error en las reglas de negocio");
             case NumberFormatException numberFormat ->
-                    buildErrorResponse(HttpStatus.BAD_REQUEST, "INVALID_ID_FORMAT", "Invalid user ID format");
+                    buildErrorResponse(HttpStatus.BAD_REQUEST, "INVALID_ID_FORMAT", 
+                        "Formato de ID inválido");
             default ->
-                    buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", "An unexpected error occurred");
+                    buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", 
+                        "Error interno del servidor");
         };
     }
 
