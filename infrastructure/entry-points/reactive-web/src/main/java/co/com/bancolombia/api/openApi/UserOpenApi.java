@@ -1,4 +1,4 @@
-package co.com.bancolombia.api;
+package co.com.bancolombia.api.openApi;
 
 import co.com.bancolombia.api.user.UserHandler;
 import co.com.bancolombia.api.user.dto.ErrorResponseDTO;
@@ -6,9 +6,9 @@ import co.com.bancolombia.api.user.dto.UserRequestDTO;
 import co.com.bancolombia.api.user.dto.UserResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
@@ -16,18 +16,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.reactive.function.server.RouterFunction;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.reactive.function.server.RequestPredicates;
+import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
-
-import static org.springframework.web.reactive.function.server.RequestPredicates.*;
-import static org.springframework.web.reactive.function.server.RouterFunctions.route;
+import org.springframework.web.reactive.function.server.RouterFunction;
 
 @Configuration
-public class RouterRest {
+public class UserOpenApi {
 
     private static final String API_V1_USERS = "/api/v1/users";
-/*
-    @Bean("userRoutes")
+
+    @Bean
     @RouterOperations({
             @RouterOperation(
                     path = API_V1_USERS,
@@ -89,23 +89,11 @@ public class RouterRest {
                             }
                     )
             )
-    })*/
-    @Bean
-    public RouterFunction<ServerResponse> userRoutes(UserHandler userHandler) {
-        return route()
-                .POST(API_V1_USERS, accept(MediaType.APPLICATION_JSON), userHandler::saveUser)
-                .GET(API_V1_USERS + "/{id}", userHandler::getUserById)
-                .GET(API_V1_USERS, userHandler::getAllUsers)
-                .build();
-    }
-
-    @Bean
-    public RouterFunction<ServerResponse> healthRoutes() {
-        return route()
-                .GET("/health", request ->
-                        ServerResponse.ok()
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue("{\"status\":\"UP\",\"service\":\"projectPragma\"}"))
-                .build();
+    })
+    public RouterFunction<ServerResponse> userRoutesDoc() {
+        return RouterFunctions.route(
+                RequestPredicates.GET("/__dummy__"),
+                req -> ServerResponse.ok().build()
+        );
     }
 }

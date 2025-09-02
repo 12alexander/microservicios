@@ -30,19 +30,19 @@
         </createIndex>
 
         <insert tableName="roles">
-            <column name="id_rol" value="1"/>
+            <column name="id_rol" value="80e86d27-20a4-44be-b90d-44eeb378d409"/>
             <column name="nombre" value="ADMIN"/>
             <column name="descripcion" value="Administrador del sistema"/>
         </insert>
 
         <insert tableName="roles">
-            <column name="id_rol" value="2"/>
-            <column name="nombre" value="USER"/>
+            <column name="id_rol" value="b71ed6c9-1dd9-4c14-8a4a-fe06166d5cdb"/>
+            <column name="nombre" value="CLIENT"/>
             <column name="descripcion" value="Usuario estándar"/>
         </insert>
 
         <insert tableName="roles">
-            <column name="id_rol" value="3"/>
+            <column name="id_rol" value="3a371249-a1f0-4eb3-b06c-5a670ab6eca9"/>
             <column name="nombre" value="GUEST"/>
             <column name="descripcion" value="Usuario invitado"/>
         </insert>

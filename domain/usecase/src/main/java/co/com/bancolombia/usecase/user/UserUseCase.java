@@ -53,6 +53,17 @@ public class UserUseCase implements IUserUseCase {
                 });
     }
 
+    public Mono<User> getUserByEmailAddress(String id) {
+        return userRepository.getUserById(id)
+                .switchIfEmpty(Mono.error(new UserExistsException("Usuario no encontrado con ID: " + id)))
+                .onErrorMap(error -> {
+                    if (error instanceof UserExistsException) {
+                        return error;
+                    }
+                    return new InvalidDataException("Error interno al obtener usuario", error);
+                });
+    }
+
     private Mono<Void> confirmRoleExists(String idRol) {
         return roleRepository.existsById(idRol)
                 .flatMap(exists -> {
