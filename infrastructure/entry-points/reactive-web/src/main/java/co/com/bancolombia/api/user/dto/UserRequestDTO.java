@@ -1,5 +1,6 @@
 package co.com.bancolombia.api.user.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "Request data for creating a new user")
 public class UserRequestDTO {
 
     @NotBlank(message = "El nombre es requerido")
@@ -40,5 +42,10 @@ public class UserRequestDTO {
 
     @NotBlank(message = "El ID del rol es requerido")
     private String idRol;
+
+    @NotBlank(message = "La contraseña es requerida")
+    @Size(min = 3, message = "La contraseña debe tener al menos 3 caracteres")
+    @Schema(description = "User password", example = "123", minLength = 3)
+    private String password;
 
 }

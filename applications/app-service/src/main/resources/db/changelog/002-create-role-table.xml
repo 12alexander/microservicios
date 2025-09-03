@@ -73,7 +73,7 @@
 
         <!-- PASO 2: Actualizar registros existentes con rol por defecto -->
         <update tableName="users">
-            <column name="id_rol" value="2"/>
+            <column name="id_rol" value="b71ed6c9-1dd9-4c14-8a4a-fe06166d5cdb"/>
             <where>id_rol IS NULL</where>
         </update>
 
@@ -96,6 +96,56 @@
         <rollback>
             <dropForeignKeyConstraint baseTableName="users" constraintName="fk_user_role"/>
             <dropColumn tableName="users" columnName="id_rol"/>
+        </rollback>
+    </changeSet>
+
+    <!-- ChangeSet para insertar usuarios de ejemplo -->
+    <changeSet id="002-insert-sample-users" author="sistema">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="users"/>
+            <tableExists tableName="roles"/>
+            <columnExists tableName="users" columnName="id_rol"/>
+            <columnExists tableName="users" columnName="password"/>
+        </preConditions>
+
+        <comment>Insertar usuarios de ejemplo para testing</comment>
+
+        <!-- Admin User - email: admin@pragma.com, password: admin123 -->
+        <insert tableName="users">
+            <column name="id" value="123e4567-e89b-12d3-a456-426614174000"/>
+            <column name="name" value="Admin"/>
+            <column name="last_name" value="User"/>
+            <column name="birth_date" value="1990-01-01"/>
+            <column name="address" value="Admin Address 123"/>
+            <column name="phone" value="1234567890"/>
+            <column name="email_address" value="admin@pragma.com"/>
+            <column name="base_salary" value="5000000.00"/>
+            <column name="id_rol" value="80e86d27-20a4-44be-b90d-44eeb378d409"/>
+            <column name="password" value="$2a$10$/X1Yl2KU/wo83LDuU64CCO.G1tEF4089lJSgC0WEp2NQ8v736ZYH2"/>
+            <column name="creation_date" value="2024-01-01T00:00:00"/>
+            <column name="update_date" value="2024-01-01T00:00:00"/>
+        </insert>
+
+        <!-- Client User - email: client@pragma.com, password: client123 -->
+        <insert tableName="users">
+            <column name="id" value="223e4567-e89b-12d3-a456-426614174001"/>
+            <column name="name" value="Client"/>
+            <column name="last_name" value="Test"/>
+            <column name="birth_date" value="1992-05-15"/>
+            <column name="address" value="Client Address 456"/>
+            <column name="phone" value="9876543210"/>
+            <column name="email_address" value="client@pragma.com"/>
+            <column name="base_salary" value="2500000.00"/>
+            <column name="id_rol" value="b71ed6c9-1dd9-4c14-8a4a-fe06166d5cdb"/>
+            <column name="password" value="$2a$10$hCjqnUfEYtOPUg5VIkDmBOHjWPBAuE./SOScQpZBlr2urSUcZNMRW"/>
+            <column name="creation_date" value="2024-01-01T00:00:00"/>
+            <column name="update_date" value="2024-01-01T00:00:00"/>
+        </insert>
+
+        <rollback>
+            <delete tableName="users">
+                <where>id IN ('123e4567-e89b-12d3-a456-426614174000', '223e4567-e89b-12d3-a456-426614174001')</where>
+            </delete>
         </rollback>
     </changeSet>
 

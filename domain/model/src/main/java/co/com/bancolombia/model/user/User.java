@@ -21,6 +21,7 @@ public class User {
     private BigDecimal baseSalary;
     private String idRol;
     private Role role;
+    private String password;
 
     public static class UserBuilder {
         public UserBuilder name(String name) {
@@ -69,6 +70,17 @@ public class User {
             this.idRol = idRol.trim();
             return this;
         }
+
+        public UserBuilder password(String password) {
+            if(password == null || password.trim().isEmpty()){
+                throw new IllegalArgumentException("Password no puede ser Nulo o Vacio");
+            }
+            if(password.length() < 3){
+                throw new IllegalArgumentException("Password debe tener al menos 3 caracteres");
+            }
+            this.password = password;
+            return this;
+        }
     }
 
     public void  validateData(){
@@ -103,6 +115,14 @@ public class User {
 
         if (idRol == null || idRol.trim().isEmpty()) {
             throw new IllegalArgumentException("El ID del rol no puede ser nulo o vacío");
+        }
+
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("El password no puede ser nulo o vacío");
+        }
+
+        if (password.length() < 3) {
+            throw new IllegalArgumentException("El password debe tener al menos 3 caracteres");
         }
 
     }

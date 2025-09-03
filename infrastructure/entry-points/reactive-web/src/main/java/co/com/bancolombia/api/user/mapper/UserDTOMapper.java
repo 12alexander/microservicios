@@ -21,6 +21,7 @@ public class UserDTOMapper {
                 .emailAddress(request.getEmailAddress())
                 .baseSalary(request.getBaseSalary())
                 .idRol(request.getIdRol())
+                .password(request.getPassword())
                 .build();
     }
 

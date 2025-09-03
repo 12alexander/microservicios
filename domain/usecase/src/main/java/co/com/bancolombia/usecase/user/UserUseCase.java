@@ -53,9 +53,9 @@ public class UserUseCase implements IUserUseCase {
                 });
     }
 
-    public Mono<User> getUserByEmailAddress(String id) {
-        return userRepository.getUserById(id)
-                .switchIfEmpty(Mono.error(new UserExistsException("Usuario no encontrado con ID: " + id)))
+    public Mono<User> getUserByEmailAddress(String email_address) {
+        return userRepository.getUserByEmailAddress(email_address)
+                .switchIfEmpty(Mono.error(new UserExistsException("Usuario no encontrado con Email: " + email_address)))
                 .onErrorMap(error -> {
                     if (error instanceof UserExistsException) {
                         return error;

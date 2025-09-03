@@ -14,6 +14,7 @@ class UserTest {
                 .emailAddress("juan@email.com")
                 .baseSalary(new BigDecimal("1000000"))
                 .idRol("DEV")
+                .password("testpass123")
                 .build();
 
         assertNotNull(user);
@@ -30,6 +31,7 @@ class UserTest {
                     .emailAddress("ana@email.com")
                     .baseSalary(new BigDecimal("-1000"))
                     .idRol("DEV")
+                    .password("testpass123")
                     .build();
         });
     }
@@ -42,6 +44,7 @@ class UserTest {
                     .lastName("Garcia")
                     .emailAddress("test@email.com")
                     .baseSalary(new BigDecimal("1000000"))
+                    .password("testpass123")
                     .build();
         });
     }

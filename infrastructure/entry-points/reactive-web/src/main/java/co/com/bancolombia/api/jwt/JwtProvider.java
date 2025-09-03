@@ -47,4 +47,17 @@ public class JwtProvider {
     public UUID extractRoleId(String token) {
         return UUID.fromString(extractAllClaims(token).get("idRol", String.class));
     }
+
+    public boolean isTokenValid(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            return !claims.getExpiration().before(new Date());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public Date extractExpiration(String token) {
+        return extractAllClaims(token).getExpiration();
+    }
 }

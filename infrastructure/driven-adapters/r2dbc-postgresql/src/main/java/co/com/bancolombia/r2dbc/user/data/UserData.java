@@ -53,6 +53,9 @@ public class UserData {
     @Column("id_rol")
     private String idRol;
 
+    @Column("password")
+    private String password;
+
     @Transient
     private RoleData role;
 

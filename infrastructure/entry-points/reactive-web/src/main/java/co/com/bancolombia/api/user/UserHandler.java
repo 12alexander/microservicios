@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -34,6 +35,7 @@ import java.time.Duration;
 public class UserHandler {
 
     private final IUserUseCase userUseCase;
+    private final PasswordEncoder passwordEncoder;
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(30);
 
     @Operation(summary = "Create a new user", description = "Creates a new user in the system")
@@ -55,6 +57,7 @@ public class UserHandler {
                 .timeout(REQUEST_TIMEOUT)
                 .doOnNext(this::logUserCreationRequest)
                 .doOnNext(this::validateRequestData)
+                .map(this::encryptPassword)
                 .map(UserDTOMapper::toDomain)
                 .flatMap(userUseCase::saveUser)
                 .map(UserDTOMapper::toResponse)
@@ -109,6 +112,21 @@ public class UserHandler {
         if (dto.getName() == null || dto.getName().isBlank()) {
             throw new InvalidDataException("Name is required");
         }
+    }
+
+    private UserRequestDTO encryptPassword(UserRequestDTO dto) {
+        String encryptedPassword = passwordEncoder.encode(dto.getPassword());
+        return UserRequestDTO.builder()
+                .name(dto.getName())
+                .lastName(dto.getLastName())
+                .birthDate(dto.getBirthDate())
+                .address(dto.getAddress())
+                .phone(dto.getPhone())
+                .emailAddress(dto.getEmailAddress())
+                .baseSalary(dto.getBaseSalary())
+                .idRol(dto.getIdRol())
+                .password(encryptedPassword)
+                .build();
     }
 
     private Mono<ServerResponse> handleError(Throwable throwable) {

@@ -1,6 +1,7 @@
 package co.com.bancolombia.usecase.auth;
 
 import co.com.bancolombia.model.auth.Auth;
+import co.com.bancolombia.model.exception.AuthException;
 import co.com.bancolombia.usecase.user.UserUseCase;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -16,14 +17,14 @@ public class AuthUseCase {
                             String password,
                             BiFunction<UUID, UUID, String> tokenGenerator,
                             BiFunction<String, String, Boolean> passwordMatches){
-        return userUseCase.findByEmailAddress(email)
-                .switchIfEmpty(Mono.error(() -> new AuthenticationException("User not found for email: " + email)))
+        return userUseCase.getUserByEmailAddress(email)
+                .switchIfEmpty(Mono.error(() -> new AuthException("User not found for email: " + email)))
                 .flatMap(user -> {
                     if (!passwordMatches.apply(password, user.getPassword())) {
-                        return Mono.error(() -> new AuthenticationException("Invalid credentials"));
+                        return Mono.error(() -> new AuthException("Invalid credentials"));
                     }
-                    String token = tokenGenerator.apply(user.getIdUser(), user.getIdRol());
-                    return Mono.just(new Auth(user.getIdUser(), user.getIdRol(), user.getFirstName(), token));
+                    String token = tokenGenerator.apply(UUID.fromString(user.getId()), UUID.fromString(user.getIdRol()));
+                    return Mono.just(new Auth(UUID.fromString(user.getId()), UUID.fromString(user.getIdRol()), token, user.getName()));
                 });
     }
 }

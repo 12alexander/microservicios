@@ -1,0 +1,125 @@
+package co.com.bancolombia.api.auth;
+
+import co.com.bancolombia.api.auth.dto.AuthRequestDTO;
+import co.com.bancolombia.api.auth.dto.AuthResponseDTO;
+import co.com.bancolombia.api.jwt.JwtProvider;
+import co.com.bancolombia.model.exception.AuthException;
+import co.com.bancolombia.usecase.auth.AuthUseCase;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
+
+import java.util.Map;
+import java.util.UUID;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class AuthHandler {
+
+    private final AuthUseCase authUseCase;
+    private final JwtProvider jwtProvider;
+    private final PasswordEncoder passwordEncoder;
+
+    public Mono<ServerResponse> login(ServerRequest request) {
+        return request.bodyToMono(AuthRequestDTO.class)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Request body cannot be empty")))
+                .flatMap(dto -> authUseCase.login(
+                        dto.getEmail(),
+                        dto.getPassword(),
+                        jwtProvider::generateToken,
+                        (password, hashedPassword) -> {
+                            log.debug("[AUTH] Comparing password - Raw: '{}', Hashed: '{}'", password, hashedPassword);
+                            if (hashedPassword == null || hashedPassword.trim().isEmpty()) {
+                                log.error("[AUTH] Hashed password is null or empty");
+                                return false;
+                            }
+                            return passwordEncoder.matches(password, hashedPassword);
+                        }
+                ))
+                .map(auth -> AuthResponseDTO.builder()
+                        .idUser(auth.getIdUser())
+                        .idRol(auth.getIdRole())
+                        .nameUser(auth.getNameUser())
+                        .token(auth.getToken())
+                        .build())
+                .flatMap(authResponse -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(authResponse))
+                .onErrorResume(this::handleLoginError)
+                .doOnSuccess(resp -> log.info("[AUTH] Login attempt processed successfully"))
+                .doOnError(error -> log.error("[AUTH] Login attempt failed: {}", error.getMessage()));
+    }
+
+    public Mono<ServerResponse> validateToken(ServerRequest request) {
+        String authHeader = request.headers().firstHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(Map.of("error", "Missing or invalid Authorization header"));
+        }
+
+        String token = authHeader.substring(7);
+
+        try {
+            if (!jwtProvider.isTokenValid(token)) {
+                return ServerResponse.status(HttpStatus.UNAUTHORIZED)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(Map.of("error", "Invalid or expired token"));
+            }
+
+            UUID idUser = jwtProvider.extractUserId(token);
+            UUID idRol = jwtProvider.extractRoleId(token);
+
+            AuthResponseDTO response = AuthResponseDTO.builder()
+                    .idUser(idUser)
+                    .idRol(idRol)
+                    .token(token)
+                    .build();
+
+            return ServerResponse.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(response);
+
+        } catch (Exception e) {
+            log.error("[AUTH] Token validation failed: {}", e.getMessage());
+            return ServerResponse.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(Map.of("error", "Invalid token"));
+        }
+    }
+
+    private Mono<ServerResponse> handleLoginError(Throwable throwable) {
+        log.error("[AUTH] Login error: {}", throwable.getMessage());
+
+        if (throwable instanceof AuthException) {
+            return ServerResponse.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(Map.of(
+                            "error", "Authentication failed",
+                            "message", throwable.getMessage(),
+                            "code", ((AuthException) throwable).getCode()
+                    ));
+        }
+
+        if (throwable instanceof IllegalArgumentException) {
+            return ServerResponse.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(Map.of("error", throwable.getMessage()));
+        }
+
+        return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of(
+                        "error", "Internal server error",
+                        "message", "An unexpected error occurred during authentication"
+                ));
+    }
+}

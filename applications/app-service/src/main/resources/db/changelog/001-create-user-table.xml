@@ -38,6 +38,9 @@
             <column name="base_salary" type="DECIMAL(15,2)">
                 <constraints nullable="false"/>
             </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="creation_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -62,5 +65,6 @@
             <dropTable tableName="users"/>
         </rollback>
     </changeSet>
+
 
 </databaseChangeLog>

@@ -37,14 +37,23 @@ public class JwtAuthenticationFilter implements WebFilter {
         String token = authHeader.substring(BEARER_PREFIX.length());
 
         try {
+            if (!jwtProvider.isTokenValid(token)) {
+                log.warn("[JWT Filter] Token expired or invalid for request: {}", 
+                        exchange.getRequest().getPath().value());
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
+
             Claims claims = jwtProvider.extractAllClaims(token);
             String userId = claims.getSubject();
             String role = claims.get("idRol", String.class);
 
+            log.debug("[JWT Filter] Token validated successfully for user: {}", userId);
+
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             userId,
-                            null,
+                            token,
                             List.of(new SimpleGrantedAuthority("ROLE_" + role))
                     );
 
@@ -52,7 +61,8 @@ public class JwtAuthenticationFilter implements WebFilter {
                     .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication));
 
         } catch (Exception e) {
-            log.error("[JWT Filter] Invalid token", e);
+            log.error("[JWT Filter] Token validation failed for request: {}, error: {}", 
+                    exchange.getRequest().getPath().value(), e.getMessage());
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }

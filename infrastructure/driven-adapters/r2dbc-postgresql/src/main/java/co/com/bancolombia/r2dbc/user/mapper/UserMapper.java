@@ -23,6 +23,7 @@ public class UserMapper {
                 .emailAddress(user.getEmailAddress())
                 .baseSalary(user.getBaseSalary())
                 .idRol(user.getIdRol())
+                .password(user.getPassword())
                 .creationDate(now)
                 .updateDate(now)
                 .build();
@@ -40,6 +41,7 @@ public class UserMapper {
                 .emailAddress(user.getEmailAddress())
                 .baseSalary(user.getBaseSalary())
                 .idRol(user.getIdRol())
+                .password(user.getPassword())
                 .updateDate(now)
                 .build();
     }
@@ -55,8 +57,8 @@ public class UserMapper {
                 .emailAddress(userData.getEmailAddress())
                 .baseSalary(userData.getBaseSalary())
                 .idRol(userData.getIdRol())
-                .role(userData.getRole() != null ? RoleMapper.toDomain(userData.getRole()) :
-                        null)  // ← FIX AQUÍ
+                .password(userData.getPassword())
+                .role(userData.getRole() != null ? RoleMapper.toDomain(userData.getRole()) : null)
                 .build();
     }
 }

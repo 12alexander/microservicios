@@ -37,6 +37,7 @@ public class UserRepositoryAdapter implements UserRepository {
                         data.getEmailAddress(),
                         data.getBaseSalary(),
                         data.getIdRol(),
+                        data.getPassword(),
                         data.getCreationDate(),
                         data.getUpdateDate()
                 ))

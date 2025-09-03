@@ -42,6 +42,7 @@ class UserRepositoryAdapterTest {
                 .emailAddress("juan@test.com")
                 .baseSalary(new BigDecimal("2000000"))
                 .idRol("DEV")
+                .password("encodedPassword")
                 .build();
 
         userData = UserData.builder()
@@ -51,6 +52,7 @@ class UserRepositoryAdapterTest {
                 .emailAddress("juan@test.com")
                 .baseSalary(new BigDecimal("2000000"))
                 .idRol("DEV")
+                .password("encodedPassword")
                 .creationDate(LocalDateTime.now())
                 .build();
     }

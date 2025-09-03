@@ -42,6 +42,7 @@ class UserUseCaseTest {
                 .emailAddress("juan@test.com")
                 .baseSalary(new BigDecimal("2000000"))
                 .idRol("DEV")
+                .password("password123")
                 .build();
     }
 

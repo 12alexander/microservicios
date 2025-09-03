@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -18,17 +19,24 @@ import java.math.BigDecimal;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class SimpleRouterTest {
 
     private WebTestClient webTestClient;
     private IUserUseCase userUseCase;
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
         userUseCase = mock(IUserUseCase.class);
-        UserHandler userHandler = new UserHandler(userUseCase);
+        passwordEncoder = mock(PasswordEncoder.class);
+        
+        // Configure password encoder mock with lenient for tests that don't use it
+        lenient().when(passwordEncoder.encode(any(String.class))).thenReturn("encodedPassword");
+        
+        UserHandler userHandler = new UserHandler(userUseCase, passwordEncoder);
         RouterRest routerRest = new RouterRest();
         RouterFunction<ServerResponse> routes = routerRest.userRoutes(userHandler)
                 .and(routerRest.healthRoutes());
@@ -53,6 +61,7 @@ class SimpleRouterTest {
                 .emailAddress("juan@test.com")
                 .baseSalary(new BigDecimal("2000000"))
                 .idRol("DEV")
+                .password("testpass")
                 .build();
 
         User savedUser = User.builder()
@@ -61,6 +70,7 @@ class SimpleRouterTest {
                 .lastName("Perez")
                 .emailAddress("juan@test.com")
                 .baseSalary(new BigDecimal("2000000"))
+                .password("encodedPassword")
                 .build();
 
         when(userUseCase.saveUser(any(User.class))).thenReturn(Mono.just(savedUser));
@@ -86,6 +96,7 @@ class SimpleRouterTest {
                 .emailAddress("duplicado@test.com")
                 .baseSalary(new BigDecimal("2000000"))
                 .idRol("DEV")
+                .password("testpass")
                 .build();
 
         when(userUseCase.saveUser(any(User.class)))
