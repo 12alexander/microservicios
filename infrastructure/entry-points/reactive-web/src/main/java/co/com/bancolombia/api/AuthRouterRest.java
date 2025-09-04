@@ -18,7 +18,7 @@ public class AuthRouterRest {
     public RouterFunction<ServerResponse> authRoutes(AuthHandler authHandler) {
         return route()
                 .POST(ApiPaths.LOGIN, accept(MediaType.APPLICATION_JSON), authHandler::login)
-                .POST("/api/v1/auth/validate", accept(MediaType.APPLICATION_JSON), authHandler::validateToken)
+                .GET("/api/v1/auth/validate", authHandler::validateToken)
                 .build();
     }
 }
