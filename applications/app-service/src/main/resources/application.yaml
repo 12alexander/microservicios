@@ -57,5 +57,5 @@ logging:
   file:
     name: logs/crediya.log
 jwt:
-  secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationShouldBeAtLeast32Characters}
-  expiration-ms: ${JWT_EXPIRATION:3600000}
+  secret: mySecretKeyForJWTTokenGenerationShouldBeAtLeast32Characters
+  expiration-ms: 3600000
