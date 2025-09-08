@@ -40,7 +40,7 @@ public class UserOpenApi {
                             summary = "Create a new user",
                             description = "Creates a new user in the system",
                             requestBody = @RequestBody(
-                                    required = true,
+                                       required = true,
                                     description = "User data to create",
                                     content = @Content(schema = @Schema(implementation = UserRequestDTO.class))
                             ),

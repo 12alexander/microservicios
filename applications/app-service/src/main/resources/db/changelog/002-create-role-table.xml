@@ -43,7 +43,7 @@
 
         <insert tableName="roles">
             <column name="id_rol" value="3a371249-a1f0-4eb3-b06c-5a670ab6eca9"/>
-            <column name="nombre" value="GUEST"/>
+            <column name="nombre" value="ASSESSOR"/>
             <column name="descripcion" value="Usuario invitado"/>
         </insert>
 
@@ -142,9 +142,25 @@
             <column name="update_date" value="2024-01-01T00:00:00"/>
         </insert>
 
+        <!-- Assessor User - email: assessor@pragma.com, password: assessor123 -->
+        <insert tableName="users">
+            <column name="id" value="323e4567-e89b-12d3-a456-426614174002"/>
+            <column name="name" value="Assessor"/>
+            <column name="last_name" value="User"/>
+            <column name="birth_date" value="1988-03-10"/>
+            <column name="address" value="Assessor Address 789"/>
+            <column name="phone" value="5551234567"/>
+            <column name="email_address" value="assessor@pragma.com"/>
+            <column name="base_salary" value="3500000.00"/>
+            <column name="id_rol" value="3a371249-a1f0-4eb3-b06c-5a670ab6eca9"/>
+            <column name="password" value="$2a$10$vSKXmSS7A1YM6Nd4twxxleFku2Q0BqPePJ6Y0pMXGo0MyJX5PREQK"/>
+            <column name="creation_date" value="2024-01-01T00:00:00"/>
+            <column name="update_date" value="2024-01-01T00:00:00"/>
+        </insert>
+
         <rollback>
             <delete tableName="users">
-                <where>id IN ('123e4567-e89b-12d3-a456-426614174000', '223e4567-e89b-12d3-a456-426614174001')</where>
+                <where>id IN ('123e4567-e89b-12d3-a456-426614174000', '223e4567-e89b-12d3-a456-426614174001', '323e4567-e89b-12d3-a456-426614174002')</where>
             </delete>
         </rollback>
     </changeSet>

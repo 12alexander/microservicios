@@ -7,9 +7,11 @@ public class PasswordGenerator {
         // Generate correct hashes
         String admin123Hash = encoder.encode("admin123");
         String client123Hash = encoder.encode("client123");
+        String assessor123Hash = encoder.encode("assessor123");
         
         System.out.println("admin123 hash: " + admin123Hash);
         System.out.println("client123 hash: " + client123Hash);
+        System.out.println("assessor123 hash: " + assessor123Hash);
         
         // Test the current hash in DB
         String currentHash = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
