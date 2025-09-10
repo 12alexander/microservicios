@@ -3,7 +3,7 @@ package co.com.bancolombia.api.openApi;
 import co.com.bancolombia.api.auth.AuthHandler;
 import co.com.bancolombia.api.auth.dto.AuthRequestDTO;
 import co.com.bancolombia.api.auth.dto.AuthResponseDTO;
-import co.com.bancolombia.api.user.dto.ErrorResponseDTO;
+import co.com.bancolombia.api.dto.ErrorResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;

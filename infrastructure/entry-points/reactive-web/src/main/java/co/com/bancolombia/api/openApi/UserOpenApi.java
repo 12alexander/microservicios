@@ -1,7 +1,7 @@
 package co.com.bancolombia.api.openApi;
 
 import co.com.bancolombia.api.user.UserHandler;
-import co.com.bancolombia.api.user.dto.ErrorResponseDTO;
+import co.com.bancolombia.api.dto.ErrorResponseDTO;
 import co.com.bancolombia.api.user.dto.UserRequestDTO;
 import co.com.bancolombia.api.user.dto.UserResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,7 +1,7 @@
 package co.com.bancolombia.api;
 
 import co.com.bancolombia.api.user.UserHandler;
-import co.com.bancolombia.api.user.dto.ErrorResponseDTO;
+import co.com.bancolombia.api.dto.ErrorResponseDTO;
 import co.com.bancolombia.api.user.dto.UserRequestDTO;
 import co.com.bancolombia.api.user.dto.UserResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -95,6 +95,7 @@ public class RouterRest {
         return route()
                 .POST(API_V1_USERS, accept(MediaType.APPLICATION_JSON), userHandler::saveUser)
                 .GET(API_V1_USERS + "/{id}", userHandler::getUserById)
+                .GET(API_V1_USERS + "/byEmail/{email}", userHandler::getUserByEmail)
                 .GET(API_V1_USERS, userHandler::getAllUsers)
                 .build();
     }

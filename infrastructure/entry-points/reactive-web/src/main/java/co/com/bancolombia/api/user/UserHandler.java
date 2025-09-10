@@ -1,7 +1,6 @@
 package co.com.bancolombia.api.user;
 
-import co.com.bancolombia.api.exception.GlobalExceptionHandler;
-import co.com.bancolombia.api.user.dto.ErrorResponseDTO;
+import co.com.bancolombia.api.dto.ErrorResponseDTO;
 import co.com.bancolombia.api.user.dto.UserRequestDTO;
 import co.com.bancolombia.api.user.mapper.UserDTOMapper;
 import co.com.bancolombia.model.exception.BusinessException;
@@ -66,8 +65,7 @@ public class UserHandler {
                         .bodyValue(response))
                 .doOnSuccess(response -> log.info("User registered successfully"))
                 .doOnError(throwable -> log.error("Error processing user registration: {}",
-                        throwable.getMessage(), throwable))
-                .onErrorResume(this::handleError);
+                        throwable.getMessage(), throwable));
     }
 
     public Mono<ServerResponse> getUserById(ServerRequest request) {
@@ -81,8 +79,21 @@ public class UserHandler {
                         .bodyValue(response))
                 .doOnSuccess(response -> log.info("User retrieved successfully: {}", userId))
                 .doOnError(throwable -> log.error("Error retrieving user {}: {}",
-                        userId, throwable.getMessage()))
-                .onErrorResume(this::handleError);
+                        userId, throwable.getMessage()));
+    }
+
+    public Mono<ServerResponse> getUserByEmail(ServerRequest request) {
+        String email = request.pathVariable("email");
+        log.info("Fetching user with email: {}", email);
+
+        return userUseCase.getUserByEmail(email)
+                .map(UserDTOMapper::toResponse)
+                .flatMap(response -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(response))
+                .doOnSuccess(response -> log.info("User retrieved successfully by email: {}", email))
+                .doOnError(throwable -> log.error("Error retrieving user by email {}: {}",
+                        email, throwable.getMessage()));
     }
 
     public Mono<ServerResponse> getAllUsers(ServerRequest request) {
@@ -96,8 +107,7 @@ public class UserHandler {
                         .bodyValue(users))
                 .doOnSuccess(response -> log.info("All users retrieved successfully"))
                 .doOnError(throwable -> log.error("Error retrieving users: {}",
-                        throwable.getMessage()))
-                .onErrorResume(this::handleError);
+                        throwable.getMessage()));
     }
 
     private void logUserCreationRequest(UserRequestDTO dto) {
@@ -129,37 +139,4 @@ public class UserHandler {
                 .build();
     }
 
-    private Mono<ServerResponse> handleError(Throwable throwable) {
-        log.error("Error processing request: {}", throwable.getMessage(), throwable);
-
-        return switch (throwable) {
-            case UserExistsException userExists ->
-                    buildErrorResponse(HttpStatus.CONFLICT, "USER_EXISTS", 
-                        "El email ya está registrado en el sistema");
-            case InvalidDataException invalidData ->
-                    buildErrorResponse(HttpStatus.BAD_REQUEST, "INVALID_DATA", 
-                        "Los datos proporcionados no son válidos");
-            case BusinessException businessError ->
-                    buildErrorResponse(HttpStatus.BAD_REQUEST, "BUSINESS_ERROR", 
-                        "Error en las reglas de negocio");
-            case NumberFormatException numberFormat ->
-                    buildErrorResponse(HttpStatus.BAD_REQUEST, "INVALID_ID_FORMAT", 
-                        "Formato de ID inválido");
-            default ->
-                    buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", 
-                        "Error interno del servidor");
-        };
-    }
-
-    private Mono<ServerResponse> buildErrorResponse(HttpStatus status, String code, String message) {
-        var errorResponse = ErrorResponseDTO.builder()
-                .code(code)
-                .message(message)
-                .timestamp(java.time.Instant.now())
-                .build();
-
-        return ServerResponse.status(status)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(errorResponse);
-    }
 }

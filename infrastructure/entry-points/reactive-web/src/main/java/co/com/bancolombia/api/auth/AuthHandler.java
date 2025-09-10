@@ -15,7 +15,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -52,7 +51,6 @@ public class AuthHandler {
                 .flatMap(authResponse -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(authResponse))
-                .onErrorResume(this::handleLoginError)
                 .doOnSuccess(resp -> log.info("[AUTH] Login attempt processed successfully"))
                 .doOnError(error -> log.error("[AUTH] Login attempt failed: {}", error.getMessage()));
     }
@@ -61,65 +59,27 @@ public class AuthHandler {
         String authHeader = request.headers().firstHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ServerResponse.badRequest()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(Map.of("error", "Missing or invalid Authorization header"));
+            throw new IllegalArgumentException("Missing or invalid Authorization header");
         }
 
         String token = authHeader.substring(7);
 
-        try {
-            if (!jwtProvider.isTokenValid(token)) {
-                return ServerResponse.status(HttpStatus.UNAUTHORIZED)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(Map.of("error", "Invalid or expired token"));
-            }
-
-            UUID idUser = jwtProvider.extractUserId(token);
-            UUID idRol = jwtProvider.extractRoleId(token);
-
-            AuthResponseDTO response = AuthResponseDTO.builder()
-                    .idUser(idUser)
-                    .idRol(idRol)
-                    .token(token)
-                    .build();
-
-            return ServerResponse.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(response);
-
-        } catch (Exception e) {
-            log.error("[AUTH] Token validation failed: {}", e.getMessage());
-            return ServerResponse.status(HttpStatus.UNAUTHORIZED)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(Map.of("error", "Invalid token"));
-        }
-    }
-
-    private Mono<ServerResponse> handleLoginError(Throwable throwable) {
-        log.error("[AUTH] Login error: {}", throwable.getMessage());
-
-        if (throwable instanceof AuthException) {
-            return ServerResponse.status(HttpStatus.UNAUTHORIZED)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(Map.of(
-                            "error", "Authentication failed",
-                            "message", throwable.getMessage(),
-                            "code", ((AuthException) throwable).getCode()
-                    ));
+        if (!jwtProvider.isTokenValid(token)) {
+            throw new co.com.bancolombia.model.exception.AuthException("Invalid or expired token");
         }
 
-        if (throwable instanceof IllegalArgumentException) {
-            return ServerResponse.status(HttpStatus.BAD_REQUEST)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(Map.of("error", throwable.getMessage()));
-        }
+        UUID idUser = jwtProvider.extractUserId(token);
+        UUID idRol = jwtProvider.extractRoleId(token);
 
-        return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        AuthResponseDTO response = AuthResponseDTO.builder()
+                .idUser(idUser)
+                .idRol(idRol)
+                .token(token)
+                .build();
+
+        return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of(
-                        "error", "Internal server error",
-                        "message", "An unexpected error occurred during authentication"
-                ));
+                .bodyValue(response);
     }
+
 }

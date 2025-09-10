@@ -105,6 +105,11 @@ public class UserUseCase implements IUserUseCase {
                 });
     }
 
+    @Override
+    public Mono<User> getUserByEmail(String email) {
+        return getUserByEmailAddress(email);
+    }
+
     /*
         public Mono<Void> deleteUser(String id) {
             return userRepository.getUserById(id)
